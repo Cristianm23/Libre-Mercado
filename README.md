@@ -1,23 +1,31 @@
-# MiPet 🐾
+# Libre Mercado 🛒
 
-**MiPet** es una aplicación móvil moderna en Android para el cuidado integral de mascotas, desarrollada con Jetpack Compose y Firebase.
+Aplicación móvil para Android desarrollada en **Kotlin** y **Jetpack Compose** que simula un marketplace moderno, permitiendo a los usuarios explorar, publicar, chatear y gestionar compras de manera intuitiva.
+
+---
 
 ## 🚀 Características Principales
 
-- **Autenticación:** Registro e inicio de sesión seguro con Firebase Auth.
-- **Gestión de Mascotas:** Perfiles personalizados y control de múltiples mascotas con fotos.
-- **Historial de Salud y Actividades:** Seguimiento de vacunas, desparasitaciones y cuidados diarios.
-- **🗺️ Mapa y Geolocalización con Google Maps:** Integración nativa de Google Maps API para mostrar la ubicación actual y encontrar veterinarias cercanas.
-- **🔍 Buscador e Indexador Inteligente de Veterinarias:** Búsqueda avanzada por ciudad o término con sistema de respaldo local para garantizar resultados precisos y rápidos en todo momento.
-- **🤖 Asistente de IA:** Recomendaciones inteligentes para el bienestar animal.
+- **Autenticación:** Registro e inicio de sesión seguro con Firebase.
+- **Catálogo y Detalles:** Exploración dinámica de productos con vistas detalladas.
+- **Publicación de Productos:** Interfaz para que los usuarios publiquen nuevos artículos en venta.
+- **Carrito de Compras:** Gestión completa de productos añadidos al carrito.
+- **Chat e IA:** Soporte de mensajería y asistente inteligente.
+- **Panel de Administración:** Herramientas de control y gestión general.
+- **Calificaciones:** Sistema de reseñas y calificaciones de productos.
 
 ## 🛠️ Stack Tecnológico
 
-- **UI:** Jetpack Compose & Material 3
-- **Arquitectura:** MVVM + Repository Pattern
-- **Mapas:** Google Maps Compose (`maps-compose`, `play-services-maps`)
-- **Backend:** Firebase (Auth, Firestore, Storage)
-- **Networking:** Retrofit, OkHttp, OkHttpClient
+- **Lenguaje:** Kotlin
+- **Interfaz de Usuario:** Jetpack Compose & Material 3
+- **Arquitectura:** MVVM (Model-View-ViewModel)
+- **Inyección de Dependencias:** Hilt (Dagger)
+- **Backend & Base de Datos:** Firebase (Auth, Firestore)
+- **Asincronía & Red:** Coroutines, Flow, Retrofit
 
----
-*Desarrollado con ❤️ para los amantes de las mascotas.*
+## 📦 Instalación y Uso
+
+1. Clona el repositorio:
+   ```bash
+   git clone https://github.com/Cristianm23/Libre-Mercado.git
+   
