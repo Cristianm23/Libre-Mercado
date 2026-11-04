@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "792299519535",
+    "project_id": "mercadillo-1eb76",
+    "storage_bucket": "mercadillo-1eb76.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:792299519535:android:f48e74d967dbbc365790da",
+        "android_client_info": {
+          "package_name": "com.usb.libremercado"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClHMKjM3J4IdD_nG0wqK4D_75R0O__jGg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
