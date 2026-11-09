@@ -8,11 +8,11 @@ Aplicación móvil para Android desarrollada en **Kotlin** y **Jetpack Compose**
 
 - **Autenticación:** Registro e inicio de sesión seguro con Firebase.
 - **Catálogo y Detalles:** Exploración dinámica de productos con vistas detalladas.
-- **Publicación de Productos:** Interfaz para que los usuarios publiquen nuevos artículos en venta.
-- **Carrito de Compras:** Gestión completa de productos añadidos al carrito.
-- **Chat e IA:** Soporte de mensajería y asistente inteligente.
+- **Publicación de Productos:** Interfaz para que los usuarios publiquen nuevos artículos en venta (hasta 5 fotos, cámara y galería).
+- **Carrito de Compras:** Gestión completa de productos añadidos al carrito con cálculo de totales y simulación de pago.
+- **Chat y Mensajería:** Mensajería en tiempo real entre compradores y vendedores con lectura automática de mensajes y saludo inicial.
 - **Panel de Administración:** Herramientas de control y gestión general.
-- **Calificaciones:** Sistema de reseñas y calificaciones de productos.
+- **Calificaciones:** Sistema de reseñas y calificaciones a vendedores.
 
 ## 🛠️ Stack Tecnológico
 
@@ -20,8 +20,8 @@ Aplicación móvil para Android desarrollada en **Kotlin** y **Jetpack Compose**
 - **Interfaz de Usuario:** Jetpack Compose & Material 3
 - **Arquitectura:** MVVM (Model-View-ViewModel)
 - **Inyección de Dependencias:** Hilt (Dagger)
-- **Backend & Base de Datos:** Firebase (Auth, Firestore)
-- **Asincronía & Red:** Coroutines, Flow, Retrofit
+- **Backend & Base de Datos:** Firebase (Auth, Firestore, Storage)
+- **Asincronía & Red:** Coroutines, Flow
 
 ## 📦 Instalación y Uso
 
