@@ -17,7 +17,8 @@ data class Producto(
     val categoria: String = "",
     val estado: String = "nuevo", // "nuevo" | "usado"
     val cantidad: Int = 0,
-    val imagen: String = "", // URL de Firebase Storage
+    val imagen: String = "", // URL principal de Firebase Storage
+    val imagenes: List<String> = emptyList(), // Lista de imágenes adicionales (hasta 5)
     val vendedorId: String = "",
     val calificacion: Double = 0.0,
     val activo: Boolean = true // permite moderación/desactivación por admin
@@ -48,7 +49,8 @@ data class Chat(
     val vendedorId: String = "",
     val productoId: String = "",
     val ultimoMensaje: String = "",
-    val ultimaActualizacion: Long = System.currentTimeMillis()
+    val ultimaActualizacion: Long = System.currentTimeMillis(),
+    val leidoPor: List<String> = emptyList()
 )
 
 data class Mensaje(

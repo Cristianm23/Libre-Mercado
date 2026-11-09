@@ -1,5 +1,6 @@
 package com.usb.libremercado.data.repository
 
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.usb.libremercado.data.model.Chat
@@ -55,13 +56,22 @@ class ChatRepository @Inject constructor(
             
             db.collection("Chats").document(mensaje.chatId).update(
                 "ultimoMensaje", mensaje.contenido,
-                "ultimaActualizacion", mensaje.timestamp
+                "ultimaActualizacion", mensaje.timestamp,
+                "leidoPor", listOf(mensaje.emisorId)
             ).await()
             
             Resource.Success(Unit)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Error al enviar mensaje")
         }
+    }
+
+    suspend fun markAsRead(chatId: String, userId: String) {
+        try {
+            db.collection("Chats").document(chatId)
+                .update("leidoPor", FieldValue.arrayUnion(userId))
+                .await()
+        } catch (_: Exception) {}
     }
 
     suspend fun createOrGetChat(compradorId: String, vendedorId: String, productoId: String): Resource<String> {
@@ -76,13 +86,6 @@ class ChatRepository @Inject constructor(
                 Resource.Success(query.documents[0].id)
             } else {
                 val chatId = db.collection("Chats").document().id
-                val chat = Chat(
-                    id = chatId,
-                    compradorId = compradorId,
-                    vendedorId = vendedorId,
-                    productoId = productoId
-                )
-                // Add a participants list for easier querying
                 val chatData = hashMapOf(
                     "id" to chatId,
                     "compradorId" to compradorId,
@@ -90,7 +93,8 @@ class ChatRepository @Inject constructor(
                     "productoId" to productoId,
                     "ultimoMensaje" to "",
                     "ultimaActualizacion" to System.currentTimeMillis(),
-                    "participantes" to listOf(compradorId, vendedorId)
+                    "participantes" to listOf(compradorId, vendedorId),
+                    "leidoPor" to listOf(compradorId)
                 )
                 db.collection("Chats").document(chatId).set(chatData).await()
                 Resource.Success(chatId)

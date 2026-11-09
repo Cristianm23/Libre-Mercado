@@ -1,6 +1,5 @@
 package com.usb.libremercado.ui.screens.chat
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -30,8 +29,28 @@ fun ChatScreen(
     onBack: () -> Unit
 ) {
     val mensajesState by viewModel.mensajes.collectAsState()
+    val chatState by viewModel.chat.collectAsState()
+    val sendError by viewModel.sendError.collectAsState()
     val currentUserId = viewModel.currentUserId ?: ""
+    val receptorId = viewModel.otherUserId
+
     var textMessage by remember { mutableStateOf("") }
+    var defaultInitialized by remember { mutableStateOf(false) }
+    val sending = remember { mutableStateOf(false) }
+
+    LaunchedEffect(chatState, mensajesState) {
+        if (!defaultInitialized) {
+            val chat = (chatState as? Resource.Success)?.data
+            val mensajes = (mensajesState as? Resource.Success)?.data
+            if (chat != null && mensajes != null) {
+                val isBuyer = chat.compradorId == currentUserId
+                if (isBuyer && mensajes.isEmpty()) {
+                    textMessage = "Hola, me interesa. ¿Cuánto es lo mínimo?"
+                }
+                defaultInitialized = true
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -63,13 +82,16 @@ fun ChatScreen(
                         placeholder = { Text("Escribe un mensaje...") },
                         maxLines = 3
                     )
-                    IconButton(onClick = {
-                        // In a real app we would know the receptorId from the chat object
-                        // For simplicity, we'll need to fetch the chat details or pass receptorId
-                        // I'll assume for now we can get it from the last message or just pass a placeholder
-                        viewModel.enviarMensaje(textMessage, "")
-                        textMessage = ""
-                    }) {
+                    IconButton(
+                        enabled = textMessage.isNotBlank() && !sending.value,
+                        onClick = {
+                            sending.value = true
+                            viewModel.enviarMensaje(textMessage, receptorId) {
+                                sending.value = false
+                                textMessage = ""
+                            }
+                        }
+                    ) {
                         Icon(Icons.Default.Send, contentDescription = "Enviar")
                     }
                 }
@@ -77,6 +99,10 @@ fun ChatScreen(
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize()) {
+            if (chatState is Resource.Error) {
+                ErrorMessage(chatState.message ?: "No se pudo cargar la conversación")
+            }
+            sendError?.let { ErrorMessage(it) }
             when (mensajesState) {
                 is Resource.Loading -> LoadingScreen()
                 is Resource.Error -> ErrorMessage(mensajesState.message ?: "Error")
@@ -92,7 +118,6 @@ fun ChatScreen(
                         }
                     }
                 }
-                else -> {}
             }
         }
     }

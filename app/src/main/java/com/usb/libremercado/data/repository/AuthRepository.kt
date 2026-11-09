@@ -19,8 +19,21 @@ class AuthRepository @Inject constructor(
         return try {
             val result = auth.signInWithEmailAndPassword(correo, contrasena).await()
             val uid = result.user?.uid ?: throw Exception("Error al obtener UID")
-            val doc = db.collection("usuarios").document(uid).get().await()
-            val usuario = doc.toObject(Usuario::class.java) ?: throw Exception("Usuario no encontrado")
+            val docRef = db.collection("usuarios").document(uid)
+            val doc = docRef.get().await()
+            
+            val usuario = if (doc.exists()) {
+                doc.toObject(Usuario::class.java) ?: Usuario(uid = uid, correo = correo, nombre = correo.substringBefore("@"), tipoUsuario = "usuario")
+            } else {
+                val nuevoUsuario = Usuario(
+                    uid = uid,
+                    nombre = result.user?.displayName ?: correo.substringBefore("@"),
+                    correo = correo,
+                    tipoUsuario = "usuario"
+                )
+                docRef.set(nuevoUsuario).await()
+                nuevoUsuario
+            }
             Resource.Success(usuario)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Error desconocido")

@@ -22,7 +22,7 @@ class ProductoRepository @Inject constructor(
     fun getProductos(categoria: String? = null, query: String? = null): Flow<Resource<List<Producto>>> = callbackFlow {
         trySend(Resource.Loading())
         
-        var baseQuery: Query = db.collection("productos").whereEqualTo("activo", true)
+        var baseQuery: Query = db.collection("productos")
         
         if (!categoria.isNullOrBlank()) {
             baseQuery = baseQuery.whereEqualTo("categoria", categoria)
@@ -55,18 +55,20 @@ class ProductoRepository @Inject constructor(
         }
     }
 
-    suspend fun publicarProducto(producto: Producto, imageUri: Uri?): Resource<String> {
+    suspend fun publicarProducto(producto: Producto, imageUris: List<Uri>): Resource<String> {
         return try {
             val id = db.collection("productos").document().id
-            var imageUrl = ""
+            val imageUrls = mutableListOf<String>()
             
-            if (imageUri != null) {
+            for (uri in imageUris) {
                 val ref = storage.reference.child("productos/$id/${UUID.randomUUID()}.jpg")
-                ref.putFile(imageUri).await()
-                imageUrl = ref.downloadUrl.await().toString()
+                ref.putFile(uri).await()
+                val downloadUrl = ref.downloadUrl.await().toString()
+                imageUrls.add(downloadUrl)
             }
             
-            val finalProducto = producto.copy(id = id, imagen = imageUrl)
+            val primaryImage = imageUrls.firstOrNull() ?: ""
+            val finalProducto = producto.copy(id = id, imagen = primaryImage, imagenes = imageUrls)
             db.collection("productos").document(id).set(finalProducto).await()
             Resource.Success(id)
         } catch (e: Exception) {

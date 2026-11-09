@@ -16,6 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun LoadingScreen() {
@@ -46,5 +48,15 @@ fun RatingBar(rating: Double, modifier: Modifier = Modifier) {
                 )
             }
         }
+    }
+}
+
+fun formatPrecio(precio: Double): String {
+    return try {
+        val formatter = NumberFormat.getNumberInstance(Locale("es", "CO"))
+        formatter.maximumFractionDigits = 0
+        formatter.format(precio)
+    } catch (e: Exception) {
+        precio.toLong().toString()
     }
 }

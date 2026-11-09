@@ -29,14 +29,16 @@ class PublicarProductoViewModel @Inject constructor(
         categoria: String,
         estado: String,
         cantidad: String,
-        imageUri: Uri?
+        imageUris: List<Uri>
     ) {
         val vendedorId = authRepository.currentUser?.uid ?: return
-        
+
+        val cleanPrecio = precio.replace(".", "").replace(",", "").toDoubleOrNull() ?: 0.0
+
         val producto = Producto(
             nombre = nombre,
             descripcion = descripcion,
-            precio = precio.toDoubleOrNull() ?: 0.0,
+            precio = cleanPrecio,
             categoria = categoria,
             estado = estado,
             cantidad = cantidad.toIntOrNull() ?: 0,
@@ -45,7 +47,7 @@ class PublicarProductoViewModel @Inject constructor(
         
         viewModelScope.launch {
             _publicarState.value = Resource.Loading()
-            _publicarState.value = repository.publicarProducto(producto, imageUri)
+            _publicarState.value = repository.publicarProducto(producto, imageUris)
         }
     }
     

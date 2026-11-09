@@ -1,14 +1,15 @@
 package com.usb.libremercado.ui.screens.auth
 
+import android.content.Context
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.usb.libremercado.data.model.Resource
-import com.usb.libremercado.ui.components.LoadingScreen
 import com.usb.libremercado.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -18,12 +19,23 @@ fun LoginScreen(
     onNavigateToRegistro: () -> Unit,
     onLoginSuccess: () -> Unit
 ) {
-    var correo by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val sharedPreferences = remember {
+        context.getSharedPreferences("libre_mercado_prefs", Context.MODE_PRIVATE)
+    }
+
+    var correo by remember { mutableStateOf(sharedPreferences.getString("saved_email", "") ?: "") }
     var contrasena by remember { mutableStateOf("") }
+    var recordar by remember { mutableStateOf(true) }
     val authState by viewModel.authState.collectAsState()
 
     LaunchedEffect(authState) {
         if (authState is Resource.Success) {
+            if (recordar) {
+                sharedPreferences.edit().putString("saved_email", correo).apply()
+            } else {
+                sharedPreferences.edit().remove("saved_email").apply()
+            }
             onLoginSuccess()
             viewModel.resetState()
         }
@@ -70,7 +82,20 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Checkbox(
+                    checked = recordar,
+                    onCheckedChange = { recordar = it }
+                )
+                Text("Recordar usuario")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = { viewModel.login(correo, contrasena) },

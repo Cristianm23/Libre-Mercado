@@ -3,6 +3,7 @@ package com.usb.libremercado.viewmodel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.usb.libremercado.data.model.CarritoItem
 import com.usb.libremercado.data.model.Producto
 import com.usb.libremercado.data.model.Resource
 import com.usb.libremercado.data.model.Usuario
@@ -36,6 +37,9 @@ class DetalleProductoViewModel @Inject constructor(
     private val _chatId = MutableStateFlow<Resource<String>?>(null)
     val chatId = _chatId.asStateFlow()
 
+    private val _deleteState = MutableStateFlow<Resource<Unit>?>(null)
+    val deleteState = _deleteState.asStateFlow()
+
     init {
         getProducto()
     }
@@ -66,6 +70,29 @@ class DetalleProductoViewModel @Inject constructor(
     
     fun resetChatState() {
         _chatId.value = null
+    }
+
+    fun agregarAlCarrito() {
+        val producto = (_producto.value as? Resource.Success)?.data ?: return
+        viewModelScope.launch {
+            val uid = authRepository.currentUser?.uid ?: return@launch
+            val item = CarritoItem(
+                productoId = producto.id,
+                nombre = producto.nombre,
+                precio = producto.precio,
+                cantidad = 1,
+                imagen = producto.imagen,
+                vendedorId = producto.vendedorId
+            )
+            carritoRepository.addItem(uid, item)
+        }
+    }
+
+    fun eliminarProducto() {
+        viewModelScope.launch {
+            _deleteState.value = Resource.Loading()
+            _deleteState.value = productoRepository.deleteProducto(productoId)
+        }
     }
 
     val currentUserId get() = authRepository.currentUser?.uid

@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -23,14 +24,20 @@ import com.usb.libremercado.viewmodel.HomeViewModel
 @Composable
 fun InicioScreen(
     viewModel: HomeViewModel,
+    cartItemCount: Int,
     onNavigateToDetalle: (String) -> Unit,
     onNavigateToPublicar: () -> Unit,
     onNavigateToCarrito: () -> Unit,
-    onNavigateToPerfil: () -> Unit
+    onNavigateToPerfil: () -> Unit,
+    onNavigateToChats: () -> Unit
 ) {
     val productosState by viewModel.productos.collectAsState()
     var searchVisible by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
+
+    LaunchedEffect(viewModel) {
+        viewModel.getProductos(query = searchQuery)
+    }
 
     Scaffold(
         topBar = {
@@ -55,8 +62,19 @@ fun InicioScreen(
                     IconButton(onClick = { searchVisible = !searchVisible }) {
                         Icon(Icons.Default.Search, contentDescription = "Buscar")
                     }
+                    IconButton(onClick = onNavigateToChats) {
+                        Icon(Icons.Default.Chat, contentDescription = "Mensajes")
+                    }
                     IconButton(onClick = onNavigateToCarrito) {
-                        Icon(Icons.Default.ShoppingCart, contentDescription = "Carrito")
+                        BadgedBox(
+                            badge = {
+                                if (cartItemCount > 0) {
+                                    Badge { Text("$cartItemCount") }
+                                }
+                            }
+                        ) {
+                            Icon(Icons.Default.ShoppingCart, contentDescription = "Carrito")
+                        }
                     }
                     IconButton(onClick = onNavigateToPerfil) {
                         Icon(Icons.Default.Person, contentDescription = "Perfil")
@@ -75,22 +93,34 @@ fun InicioScreen(
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
             when (productosState) {
-                is Resource.Loading -> LoadingScreen()
-                is Resource.Error -> ErrorMessage(productosState.message ?: "Error")
+                is Resource.Loading -> {
+                    val productos = productosState.data.orEmpty()
+                    if (productos.isEmpty()) LoadingScreen() else ProductGrid(productos, onNavigateToDetalle)
+                }
+                is Resource.Error -> {
+                    val productos = productosState.data.orEmpty()
+                    if (productos.isEmpty()) ErrorMessage(productosState.message ?: "Error")
+                    else ProductGrid(productos, onNavigateToDetalle)
+                }
                 is Resource.Success -> {
-                    val productos = (productosState as Resource.Success).data ?: emptyList()
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        contentPadding = PaddingValues(8.dp)
-                    ) {
-                        items(productos) { producto ->
-                            ProductCard(producto = producto) {
-                                onNavigateToDetalle(producto.id)
-                            }
-                        }
-                    }
+                    val productos = productosState.data.orEmpty()
+                    ProductGrid(productos, onNavigateToDetalle)
                 }
                 else -> {}
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProductGrid(productos: List<com.usb.libremercado.data.model.Producto>, onNavigateToDetalle: (String) -> Unit) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        contentPadding = PaddingValues(8.dp)
+    ) {
+        items(productos) { producto ->
+            ProductCard(producto = producto) {
+                onNavigateToDetalle(producto.id)
             }
         }
     }
