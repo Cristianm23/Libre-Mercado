@@ -35,3 +35,7 @@ Aplicación móvil para Android desarrollada en **Kotlin** y **Jetpack Compose**
 
 ---
 Desarrollado para **Libre Mercado**.
+
+
+
+.
